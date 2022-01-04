@@ -8,11 +8,17 @@ public class RollerAgent : Agent
 {
     public Transform child;
     public MeshCollider mC;
+    public MeshCollider mC2;
     private Vector3 newPos;
+    [SerializeField] private Vector3 TargetNewPos;
     Rigidbody rBody;
     Vector3 targetStartPos;
     Vector3 playerStartPos;
     public float wallMinDistance = 1f;
+    [SerializeField] private float fp;
+    [SerializeField] private float fm;
+    [SerializeField] private float rp;
+    [SerializeField] private float rm;
     void Start()
     {
         rBody = GetComponent<Rigidbody>();
@@ -29,19 +35,37 @@ public class RollerAgent : Agent
             this.rBody.velocity = Vector3.zero;
             this.transform.localPosition = new Vector3(0, 0.5f, 0);
         }
-        newPos = new Vector3(Random.Range(-mC.bounds.size.x, mC.bounds.size.x), 0f, Random.Range(-mC.bounds.size.z, mC.bounds.size.z));
-        if(!mC.bounds.Contains(newPos))
-        {
-            newPos = new Vector3(Random.Range(-mC.bounds.size.x, mC.bounds.size.x), 0f, Random.Range(-mC.bounds.size.z, mC.bounds.size.z));
-        }
-        else
-        {
-            transform.position = newPos;    
-        }
-        // Move the target to a new spot
-        target.localPosition = new Vector3(Random.value * 8 - 4,
-                                           0.5f,
-                                           Random.value * 8 - 4);
+        //newPos = new Vector3(Random.Range(-mC.bounds.size.x, mC.bounds.size.x), 0f, Random.Range(-mC.bounds.size.z, mC.bounds.size.z));
+        //if (mC2.GetComponent<Transform>() != null)
+        //{
+            float randomX1 = Random.Range(-mC.bounds.size.x, mC.bounds.size.x);
+            float randomX2 = Random.Range(-mC2.bounds.size.x, mC2.bounds.size.x);
+
+            float randomZ1 = Random.Range(-mC.bounds.size.z, mC.bounds.size.z);
+            float randomZ2 = Random.Range(-mC2.bounds.size.z, mC2.bounds.size.z);
+
+            TargetNewPos = new Vector3(Random.Range(randomX1, randomX2), 0f, Random.Range(randomZ1, randomZ2));
+
+            target.position = TargetNewPos;
+        //}
+        //else
+        //{
+        //    target.localPosition = new Vector3(Random.value * 8 - 4,
+        //                       0.5f,
+        //                       Random.value * 8 - 4);
+        //}
+
+        //if (!mC.bounds.Contains(newPos))
+        //{
+        //    newPos = new Vector3(Random.Range(-mC.bounds.size.x, mC.bounds.size.x), 0f, Random.Range(-mC.bounds.size.z, mC.bounds.size.z));
+        //}
+        //else
+        //{
+        //    transform.position = newPos;
+        //}
+
+        transform.position = playerStartPos;
+
     }
     public override void CollectObservations(VectorSensor sensor)
     {
@@ -51,6 +75,11 @@ public class RollerAgent : Agent
         // Agent velocity
         sensor.AddObservation(rBody.velocity.x);
         sensor.AddObservation(rBody.velocity.z);
+        //RAYCAST INFO
+        sensor.AddObservation(fp);
+        sensor.AddObservation(rp);
+        sensor.AddObservation(fm);
+        sensor.AddObservation(rm);
     }
     public float forceMultiplier = 1;
     public override void OnActionReceived(ActionBuffers actionBuffers)
@@ -69,7 +98,7 @@ public class RollerAgent : Agent
         {
             if(hitForward.transform.tag == "Wall")
             {
-                EndEpisode();
+                fp = hitForward.distance;
             }            
             Debug.DrawLine(child.transform.position, hitForward.transform.position, Color.black);
         }
@@ -78,7 +107,7 @@ public class RollerAgent : Agent
         {
             if(hitRight.transform.tag == "Wall")
             {
-                EndEpisode();
+                rp = hitRight.distance;
             }
             Debug.DrawLine(child.transform.position, hitRight.transform.position, Color.black);
         }
@@ -87,7 +116,7 @@ public class RollerAgent : Agent
         {
             if(hitMinusForward.transform.tag == "Wall")
             {
-                EndEpisode();
+                fm = hitMinusForward.distance;
             }
             Debug.DrawLine(child.transform.position, hitMinusForward.transform.position, Color.black);
         }
@@ -96,7 +125,7 @@ public class RollerAgent : Agent
         {
             if(hitMinusRight.transform.tag == "Wall")
             {
-                EndEpisode();
+                rm = hitMinusRight.distance;
             }
             Debug.DrawLine(child.transform.position, hitMinusRight.transform.position, Color.black);
         }
@@ -106,6 +135,19 @@ public class RollerAgent : Agent
         if (distanceToTarget < 1.42f)
         {
             SetReward(1.0f);
+            if (target.position == new Vector3(-10f, 0.5f, -4f)) target.position = new Vector3(17f, 0.5f, 15f);
+            else if (target.position == new Vector3(17f, 0.5f, 15f)) target.position = new Vector3(17f, 0.5f, -14f);
+            else if (target.position == new Vector3(17f, 0.5f, -14f)) target.position = new Vector3(-10f, 0.5f, -4f);
+            else
+            {
+                target.localPosition = new Vector3(-10f, 0.5f, -4f);
+
+                // Move the target to a new spot
+                //target.localPosition = new Vector3(Random.value * 8 - 4,
+                //                                   0.5f,
+                //                                   Random.value * 8 - 4);
+
+            }
             EndEpisode();
         }
         // Fell off platform
@@ -114,10 +156,17 @@ public class RollerAgent : Agent
             EndEpisode();
         }
     }
-    public override void Heuristic(in ActionBuffers actionsOut)
+    //public override void Heuristic(in ActionBuffers actionsOut)
+    //{
+    //    var continuousActionsOut = actionsOut.ContinuousActions;
+    //    continuousActionsOut[0] = Input.GetAxis("Horizontal");
+    //    continuousActionsOut[1] = Input.GetAxis("Vertical");
+    //}
+    private void OnCollisionStay(Collision collision)
     {
-        var continuousActionsOut = actionsOut.ContinuousActions;
-        continuousActionsOut[0] = Input.GetAxis("Horizontal");
-        continuousActionsOut[1] = Input.GetAxis("Vertical");
+        if (collision.transform.tag == "Wall")
+        {
+            EndEpisode();
+        }
     }
 }

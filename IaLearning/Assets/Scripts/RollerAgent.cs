@@ -7,6 +7,8 @@ using Unity.MLAgents.Actuators;
 public class RollerAgent : Agent
 {
     public Transform child;
+    public MeshCollider mC;
+    private Vector3 newPos;
     Rigidbody rBody;
     Vector3 targetStartPos;
     Vector3 playerStartPos;
@@ -27,9 +29,19 @@ public class RollerAgent : Agent
             this.rBody.velocity = Vector3.zero;
             this.transform.localPosition = new Vector3(0, 0.5f, 0);
         }
+        newPos = new Vector3(Random.Range(-mC.bounds.size.x, mC.bounds.size.x), 0f, Random.Range(-mC.bounds.size.z, mC.bounds.size.z));
+        if(!mC.bounds.Contains(newPos))
+        {
+            newPos = new Vector3(Random.Range(-mC.bounds.size.x, mC.bounds.size.x), 0f, Random.Range(-mC.bounds.size.z, mC.bounds.size.z));
+        }
+        else
+        {
+            transform.position = newPos;    
+        }
         // Move the target to a new spot
-        target.localPosition = targetStartPos;
-        transform.position = playerStartPos;
+        target.localPosition = new Vector3(Random.value * 8 - 4,
+                                           0.5f,
+                                           Random.value * 8 - 4);
     }
     public override void CollectObservations(VectorSensor sensor)
     {

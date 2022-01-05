@@ -10,6 +10,8 @@ public class RollerAgent : Agent
     public MeshCollider mC;
     public MeshCollider mC2;
     private Vector3 newPos;
+    [SerializeField] public float time1;
+    [SerializeField] private float time2;
     [SerializeField] private Vector3 TargetNewPos;
     Rigidbody rBody;
     Vector3 targetStartPos;
@@ -24,10 +26,12 @@ public class RollerAgent : Agent
         rBody = GetComponent<Rigidbody>();
         targetStartPos = target.transform.position;
         playerStartPos = transform.position;
+        time2 = time1;
     }
     public Transform target;
     public override void OnEpisodeBegin()
     {
+        time1 = time2;
         // If the Agent fell, zero its momentum
         if (this.transform.localPosition.y < 0)
         {
@@ -35,37 +39,20 @@ public class RollerAgent : Agent
             this.rBody.velocity = Vector3.zero;
             this.transform.localPosition = new Vector3(0, 0.5f, 0);
         }
-        //newPos = new Vector3(Random.Range(-mC.bounds.size.x, mC.bounds.size.x), 0f, Random.Range(-mC.bounds.size.z, mC.bounds.size.z));
-        //if (mC2.GetComponent<Transform>() != null)
-        //{
-            float randomX1 = Random.Range(-mC.bounds.size.x, mC.bounds.size.x);
-            float randomX2 = Random.Range(-mC2.bounds.size.x, mC2.bounds.size.x);
 
-            float randomZ1 = Random.Range(-mC.bounds.size.z, mC.bounds.size.z);
-            float randomZ2 = Random.Range(-mC2.bounds.size.z, mC2.bounds.size.z);
+        target.localPosition = new Vector3(Random.value * 8 - 4,
+                           0.5f,
+                           Random.value * 8 - 4);
 
-            TargetNewPos = new Vector3(Random.Range(randomX1, randomX2), 0f, Random.Range(randomZ1, randomZ2));
-
-            target.position = TargetNewPos;
-        //}
-        //else
-        //{
-        //    target.localPosition = new Vector3(Random.value * 8 - 4,
-        //                       0.5f,
-        //                       Random.value * 8 - 4);
-        //}
-
-        //if (!mC.bounds.Contains(newPos))
-        //{
-        //    newPos = new Vector3(Random.Range(-mC.bounds.size.x, mC.bounds.size.x), 0f, Random.Range(-mC.bounds.size.z, mC.bounds.size.z));
-        //}
-        //else
-        //{
-        //    transform.position = newPos;
-        //}
-
-        transform.position = playerStartPos;
-
+        newPos = new Vector3(Random.Range(-mC.bounds.size.x, mC.bounds.size.x), 0f, Random.Range(-mC.bounds.size.z, mC.bounds.size.z));
+        if (!mC.bounds.Contains(newPos))
+        {
+            newPos = new Vector3(Random.Range(-mC.bounds.size.x, mC.bounds.size.x), 0f, Random.Range(-mC.bounds.size.z, mC.bounds.size.z));
+        }
+        else
+        {
+            transform.position = newPos;
+        }
     }
     public override void CollectObservations(VectorSensor sensor)
     {
@@ -128,6 +115,15 @@ public class RollerAgent : Agent
                 rm = hitMinusRight.distance;
             }
             Debug.DrawLine(child.transform.position, hitMinusRight.transform.position, Color.black);
+        }
+        if(time1 >= 0)
+        {
+            time1 -= Time.deltaTime;
+        }
+        else
+        {
+            time1 = time2;
+            EndEpisode();
         }
         // Rewards
         float distanceToTarget = Vector3.Distance(this.transform.localPosition, target.localPosition);

@@ -141,7 +141,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &18564871
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -237,7 +237,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &110935665
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -333,7 +333,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &145963647
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -586,7 +586,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &262549093
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -852,7 +852,7 @@ Transform:
   m_GameObject: {fileID: 310849287}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.48329878, y: -2.1583846e-16, z: -3.741992}
-  m_LocalScale: {x: 2.5360405, y: 1.9441, z: 1.3329271}
+  m_LocalScale: {x: 4.307465, y: 1.9441, z: 3.284999}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
@@ -1184,6 +1184,8 @@ MonoBehaviour:
   child: {fileID: 206668894}
   mC: {fileID: 310849288}
   mC2: {fileID: 1750818315}
+  time1: 10
+  time2: 0
   TargetNewPos: {x: 0, y: 0, z: 0}
   wallMinDistance: 1.4
   fp: 0
@@ -1527,7 +1529,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1611248174
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1623,7 +1625,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1638209806
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1719,7 +1721,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1656776589
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1911,7 +1913,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &1750818315
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2104,7 +2106,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1909082385
 BoxCollider:
   m_ObjectHideFlags: 0

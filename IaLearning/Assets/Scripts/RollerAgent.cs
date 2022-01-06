@@ -13,6 +13,9 @@ public class RollerAgent : Agent
     [SerializeField] public float time1;
     [SerializeField] private float time2;
     [SerializeField] private Vector3 TargetNewPos;
+    public Transform spawn1;
+    public Transform spawn2;
+    public Transform spawn3;
     Rigidbody rBody;
     Vector3 targetStartPos;
     Vector3 playerStartPos;
@@ -53,6 +56,7 @@ public class RollerAgent : Agent
         {
             transform.position = newPos;
         }
+        //transform.position = playerStartPos;
     }
     public override void CollectObservations(VectorSensor sensor)
     {
@@ -68,7 +72,7 @@ public class RollerAgent : Agent
         sensor.AddObservation(fm);
         sensor.AddObservation(rm);
     }
-    public float forceMultiplier = 1;
+    public float forceMultiplier = 10;
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
         // Actions, size = 2
@@ -122,8 +126,8 @@ public class RollerAgent : Agent
         }
         else
         {
-            time1 = time2;
             EndEpisode();
+            time1 = time2;
         }
         // Rewards
         float distanceToTarget = Vector3.Distance(this.transform.localPosition, target.localPosition);
@@ -131,12 +135,12 @@ public class RollerAgent : Agent
         if (distanceToTarget < 1.42f)
         {
             SetReward(1.0f);
-            if (target.position == new Vector3(-10f, 0.5f, -4f)) target.position = new Vector3(17f, 0.5f, 15f);
-            else if (target.position == new Vector3(17f, 0.5f, 15f)) target.position = new Vector3(17f, 0.5f, -14f);
-            else if (target.position == new Vector3(17f, 0.5f, -14f)) target.position = new Vector3(-10f, 0.5f, -4f);
+            if (target.position == spawn1.position) target.position = spawn2.position;
+            else if (target.position == spawn2.position) target.position = spawn3.position;
+            else if (target.position == spawn3.position) target.position = spawn1.position;
             else
             {
-                target.localPosition = new Vector3(-10f, 0.5f, -4f);
+                target.localPosition = spawn1.position;
 
                 // Move the target to a new spot
                 //target.localPosition = new Vector3(Random.value * 8 - 4,

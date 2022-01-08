@@ -8,7 +8,7 @@ public class RollerAgent : Agent
 {
     public Transform child;
     public MeshCollider mC;
-    public MeshCollider mC2;
+    //public MeshCollider mC2;
     private Vector3 newPos;
     [SerializeField] public float time1;
     [SerializeField] private float time2;
@@ -16,10 +16,12 @@ public class RollerAgent : Agent
     public Transform spawn1;
     public Transform spawn2;
     public Transform spawn3;
+    public Transform[] possibleTargetSpawns;
     Rigidbody rBody;
     Vector3 targetStartPos;
     Vector3 playerStartPos;
     public float wallMinDistance = 1f;
+    [SerializeField] private bool isWall = false;
     [SerializeField] private float fp;
     [SerializeField] private float fm;
     [SerializeField] private float rp;
@@ -43,19 +45,10 @@ public class RollerAgent : Agent
             this.transform.localPosition = new Vector3(0, 0.5f, 0);
         }
 
-        target.localPosition = new Vector3(Random.value * 8 - 4,
-                           0.5f,
-                           Random.value * 8 - 4);
+        transform.position = playerStartPos;
 
-        newPos = new Vector3(Random.Range(-mC.bounds.size.x, mC.bounds.size.x), 0f, Random.Range(-mC.bounds.size.z, mC.bounds.size.z));
-        if (!mC.bounds.Contains(newPos))
-        {
-            newPos = new Vector3(Random.Range(-mC.bounds.size.x, mC.bounds.size.x), 0f, Random.Range(-mC.bounds.size.z, mC.bounds.size.z));
-        }
-        else
-        {
-            transform.position = newPos;
-        }
+
+        
         //transform.position = playerStartPos;
     }
     public override void CollectObservations(VectorSensor sensor)
@@ -66,13 +59,23 @@ public class RollerAgent : Agent
         // Agent velocity
         sensor.AddObservation(rBody.velocity.x);
         sensor.AddObservation(rBody.velocity.z);
+        sensor.AddObservation(isWall);
+        if (isWall)
+            isWall = false;
         //RAYCAST INFO
-        sensor.AddObservation(fp);
-        sensor.AddObservation(rp);
-        sensor.AddObservation(fm);
-        sensor.AddObservation(rm);
+        //sensor.AddObservation(fp);
+        //sensor.AddObservation(rp);
+        //sensor.AddObservation(fm);
+        //sensor.AddObservation(rm);
     }
     public float forceMultiplier = 10;
+
+    public Vector3 CalculateNewPos()
+    {
+        newPos = new Vector3(Random.Range(-mC.bounds.size.x, mC.bounds.size.x), 0f, Random.Range(-mC.bounds.size.z, mC.bounds.size.z));
+        
+        return newPos;
+    }
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
         // Actions, size = 2
@@ -80,46 +83,46 @@ public class RollerAgent : Agent
         controlSignal.x = actionBuffers.ContinuousActions[0];
         controlSignal.z = actionBuffers.ContinuousActions[1];
         rBody.AddForce(controlSignal * forceMultiplier);
-        RaycastHit hitForward;
-        RaycastHit hitRight;
-        RaycastHit hitMinusForward;
-        RaycastHit hitMinusRight;
-        // RAYCAST FORWARD +
-        if(Physics.Raycast(child.transform.position, child.transform.forward, out hitForward, wallMinDistance))
-        {
-            if(hitForward.transform.tag == "Wall")
-            {
-                fp = hitForward.distance;
-            }            
-            Debug.DrawLine(child.transform.position, hitForward.transform.position, Color.black);
-        }
-        // RAYCAST RIGHT +
-        if(Physics.Raycast(child.transform.position, child.transform.right, out hitRight, wallMinDistance))
-        {
-            if(hitRight.transform.tag == "Wall")
-            {
-                rp = hitRight.distance;
-            }
-            Debug.DrawLine(child.transform.position, hitRight.transform.position, Color.black);
-        }
-        // RAYCAST FORWARD -
-        if(Physics.Raycast(child.transform.position, -child.transform.forward, out hitMinusForward, wallMinDistance))
-        {
-            if(hitMinusForward.transform.tag == "Wall")
-            {
-                fm = hitMinusForward.distance;
-            }
-            Debug.DrawLine(child.transform.position, hitMinusForward.transform.position, Color.black);
-        }
-        // RAYCAST RIGHT -
-        if(Physics.Raycast(child.transform.position, -child.transform.right, out hitMinusRight, wallMinDistance))
-        {
-            if(hitMinusRight.transform.tag == "Wall")
-            {
-                rm = hitMinusRight.distance;
-            }
-            Debug.DrawLine(child.transform.position, hitMinusRight.transform.position, Color.black);
-        }
+        //RaycastHit hitForward;
+        //RaycastHit hitRight;
+        //RaycastHit hitMinusForward;
+        //RaycastHit hitMinusRight;
+        //// RAYCAST FORWARD +
+        //if(Physics.Raycast(child.transform.position, child.transform.forward, out hitForward, wallMinDistance))
+        //{
+        //    if(hitForward.transform.tag == "Wall")
+        //    {
+        //        fp = hitForward.distance;
+        //    }            
+        //    Debug.DrawLine(child.transform.position, hitForward.transform.position, Color.black);
+        //}
+        //// RAYCAST RIGHT +
+        //if(Physics.Raycast(child.transform.position, child.transform.right, out hitRight, wallMinDistance))
+        //{
+        //    if(hitRight.transform.tag == "Wall")
+        //    {
+        //        rp = hitRight.distance;
+        //    }
+        //    Debug.DrawLine(child.transform.position, hitRight.transform.position, Color.black);
+        //}
+        //// RAYCAST FORWARD -
+        //if(Physics.Raycast(child.transform.position, -child.transform.forward, out hitMinusForward, wallMinDistance))
+        //{
+        //    if(hitMinusForward.transform.tag == "Wall")
+        //    {
+        //        fm = hitMinusForward.distance;
+        //    }
+        //    Debug.DrawLine(child.transform.position, hitMinusForward.transform.position, Color.black);
+        //}
+        //// RAYCAST RIGHT -
+        //if(Physics.Raycast(child.transform.position, -child.transform.right, out hitMinusRight, wallMinDistance))
+        //{
+        //    if(hitMinusRight.transform.tag == "Wall")
+        //    {
+        //        rm = hitMinusRight.distance;
+        //    }
+        //    Debug.DrawLine(child.transform.position, hitMinusRight.transform.position, Color.black);
+        //}
         if(time1 >= 0)
         {
             time1 -= Time.deltaTime;
@@ -135,19 +138,8 @@ public class RollerAgent : Agent
         if (distanceToTarget < 1.42f)
         {
             SetReward(1.0f);
-            if (target.position == spawn1.position) target.position = spawn2.position;
-            else if (target.position == spawn2.position) target.position = spawn3.position;
-            else if (target.position == spawn3.position) target.position = spawn1.position;
-            else
-            {
-                target.localPosition = spawn1.position;
+            target.localPosition = possibleTargetSpawns[Random.RandomRange(0, possibleTargetSpawns.Length)].position;
 
-                // Move the target to a new spot
-                //target.localPosition = new Vector3(Random.value * 8 - 4,
-                //                                   0.5f,
-                //                                   Random.value * 8 - 4);
-
-            }
             EndEpisode();
         }
         // Fell off platform
@@ -167,6 +159,20 @@ public class RollerAgent : Agent
         if (collision.transform.tag == "Wall")
         {
             EndEpisode();
+        }
+    }
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.tag == "Wall")
+        {
+            isWall = true;
+        }
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.tag == "Wall")
+        {
+            isWall = true;
         }
     }
 }

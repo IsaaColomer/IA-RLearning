@@ -6,16 +6,17 @@ using Unity.MLAgents.Sensors;
 using Unity.MLAgents.Actuators;
 public class RollerAgent : Agent
 {
+    public List<GameObject> disableTriggers = new List<GameObject>();
     public Transform child;
     public MeshCollider mC;
     //public MeshCollider mC2;
     private Vector3 newPos;
     [SerializeField] public float time1;
     [SerializeField] private float time2;
-    [SerializeField] private Vector3 TargetNewPos;
-    public Transform spawn1;
-    public Transform spawn2;
-    public Transform spawn3;
+    //[SerializeField] private Vector3 TargetNewPos;
+    // public Transform spawn1;
+    // public Transform spawn2;
+    // public Transform spawn3;
     public Transform[] possibleTargetSpawns;
     Rigidbody rBody;
     Vector3 targetStartPos;
@@ -43,6 +44,13 @@ public class RollerAgent : Agent
             this.rBody.angularVelocity = Vector3.zero;
             this.rBody.velocity = Vector3.zero;
             this.transform.localPosition = new Vector3(0, 0.5f, 0);
+        }
+        for(int i = 0; i < disableTriggers.Count; i++)
+        {
+            disableTriggers[i].GetComponent<MeshRenderer>().enabled = true;
+            disableTriggers[i].GetComponent<BoxCollider>().enabled = true;
+            disableTriggers[i].GetComponent<BoxCollider>().isTrigger = true;
+            disableTriggers.RemoveAt(i);
         }
 
         transform.position = playerStartPos;
@@ -138,7 +146,7 @@ public class RollerAgent : Agent
         if (distanceToTarget < 1.42f)
         {
             SetReward(1.0f);
-            target.localPosition = possibleTargetSpawns[Random.RandomRange(0, possibleTargetSpawns.Length)].position;
+            //target.localPosition = possibleTargetSpawns[Random.RandomRange(0, possibleTargetSpawns.Length)].position;
 
             EndEpisode();
         }
@@ -154,25 +162,35 @@ public class RollerAgent : Agent
     //    continuousActionsOut[0] = Input.GetAxis("Horizontal");
     //    continuousActionsOut[1] = Input.GetAxis("Vertical");
     //}
+    void OnCollisionEnter(Collision collision)
+    {
+        if(collision.transform.tag == "Wall")
+        {
+            isWall = true;
+        }
+    }
     private void OnCollisionStay(Collision collision)
     {
         if (collision.transform.tag == "Wall")
-        {
-            EndEpisode();
-        }
-    }
-    private void OnTriggerStay(Collider other)
-    {
-        if (other.tag == "Wall")
         {
             isWall = true;
         }
     }
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Wall")
+        if(other.tag == "Tr")
         {
-            isWall = true;
+            disableTriggers.Add(other.gameObject);
+            other.GetComponent<BoxCollider>().enabled = false;
+            other.GetComponent<MeshRenderer>().enabled = false;
+            SetReward(1.0f);
+        }
+        if(other.tag == "Bad")
+        {
+            disableTriggers.Add(other.gameObject);
+            other.GetComponent<BoxCollider>().enabled = false;
+            other.GetComponent<MeshRenderer>().enabled = false;
+            SetReward(-1.0f);
         }
     }
 }

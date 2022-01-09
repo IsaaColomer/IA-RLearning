@@ -192,5 +192,10 @@ public class RollerAgent : Agent
             other.GetComponent<MeshRenderer>().enabled = false;
             SetReward(-1.0f);
         }
+        if(other.tag == "sp")
+        {
+            SetReward(-1.0f);
+            EndEpisode();
+        }
     }
 }

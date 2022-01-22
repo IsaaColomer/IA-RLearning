@@ -13,10 +13,6 @@ public class RollerAgent : Agent
     private Vector3 newPos;
     [SerializeField] public float time1;
     [SerializeField] private float time2;
-    //[SerializeField] private Vector3 TargetNewPos;
-    // public Transform spawn1;
-    // public Transform spawn2;
-    // public Transform spawn3;
     public Transform[] possibleTargetSpawns;
     Rigidbody rBody;
     Vector3 targetStartPos;
@@ -37,6 +33,9 @@ public class RollerAgent : Agent
     public Transform target;
     public override void OnEpisodeBegin()
     {
+        int random = 0;
+        random = Random.Range(0,3);
+        transform.position = possibleTargetSpawns[random].position;
         time1 = time2;
         // If the Agent fell, zero its momentum
         if (this.transform.localPosition.y < 0)
@@ -51,13 +50,7 @@ public class RollerAgent : Agent
             disableTriggers[i].GetComponent<BoxCollider>().enabled = true;
             disableTriggers[i].GetComponent<BoxCollider>().isTrigger = true;
             disableTriggers.RemoveAt(i);
-        }
-
-        transform.position = playerStartPos;
-
-
-        
-        //transform.position = playerStartPos;
+        }        
     }
     public override void CollectObservations(VectorSensor sensor)
     {
@@ -184,6 +177,13 @@ public class RollerAgent : Agent
             other.GetComponent<BoxCollider>().enabled = false;
             other.GetComponent<MeshRenderer>().enabled = false;
             SetReward(1.0f);
+        }
+        if(other.tag == "TrLess")
+        {
+            disableTriggers.Add(other.gameObject);
+            other.GetComponent<BoxCollider>().enabled = false;
+            other.GetComponent<MeshRenderer>().enabled = false;
+            SetReward(0.5f);
         }
         if(other.tag == "Bad")
         {

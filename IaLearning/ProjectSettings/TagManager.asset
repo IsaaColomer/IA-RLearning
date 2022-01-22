@@ -9,6 +9,7 @@ TagManager:
   - Tr
   - Bad
   - sp
+  - TrLess
   layers:
   - Default
   - TransparentFX
